@@ -1,13 +1,21 @@
 {
   "name": "@mvr-studio/use-dapp-connector",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "targets": {
+    "e2e": {
+      "source": "test/e2e/index.html"
+    }
+  },
   "author": "Tomasz Marciniak <tomek@mvr.studio>",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
     "test:unit": "yarn jest",
-    "e2e:start": "parcel test/e2e/index.html --dist-dir e2e-dist"
+    "e2e:start": "parcel --dist-dir e2e-dist",
+    "e2e:build": "parcel build --dist-dir e2e-dist"
   },
   "peerDependencies": {
     "react": "^17",
@@ -19,8 +27,7 @@
   "dependencies": {
     "@cardano-sdk/dapp-connector": "^0.8.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "swr": "^2.1.1"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@testing-library/react": "^12.1.5",

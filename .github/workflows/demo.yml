@@ -1,0 +1,52 @@
+name: Deploy Demo to Pages
+
+on:
+  # workflow_run:
+  #   workflows: ['Run Tests']
+  #   branches: [main]
+  #   types:
+  #     - completed
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node.js 19.1
+        uses: actions/setup-node@v3
+        with:
+          node-version: 19.1
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Adjust NODE ENV
+        run: echo "NODE_OPTIONS=--openssl-legacy-provider" >> $GITHUB_ENV
+      - name: Build Storybook
+        run: yarn e2e:build
+      - name: Unset NODE ENV
+        run: echo "NODE_OPTIONS=" >> $GITHUB_ENV
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './e2e-dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
