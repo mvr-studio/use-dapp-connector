@@ -35,12 +35,8 @@ jobs:
           node-version: 19.1
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Adjust NODE ENV
-        run: echo "NODE_OPTIONS=--openssl-legacy-provider" >> $GITHUB_ENV
       - name: Build Storybook
         run: yarn e2e:build
-      - name: Unset NODE ENV
-        run: echo "NODE_OPTIONS=" >> $GITHUB_ENV
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
