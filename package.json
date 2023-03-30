@@ -15,7 +15,7 @@
     "build": "rimraf dist && tsc",
     "test:unit": "yarn jest",
     "e2e:start": "parcel --dist-dir e2e-dist",
-    "e2e:build": "parcel build --dist-dir e2e-dist"
+    "e2e:build": "parcel build --dist-dir e2e-dist --public-url ./"
   },
   "peerDependencies": {
     "react": "^17",
