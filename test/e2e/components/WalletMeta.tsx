@@ -14,9 +14,9 @@ const WalletMeta = ({ entries }: WalletMetaProps) => {
     <div style={{ marginTop: '1rem' }}>
       <h2 className="title is-5">Wallet Meta</h2>
       {entries.map(({ label, value }) => (
-        <div className="columns" style={{ alignItems: 'center' }}>
+        <div key={label} className="columns" style={{ alignItems: 'center' }}>
           <div className="column is-half">{label}</div>
-          <div className="column is-half">{value}</div>
+          <div className="column is-half">{value || '-'}</div>
         </div>
       ))}
     </div>

@@ -1,10 +1,18 @@
-import React, { useState } from 'react'
-import { useDappConnector } from '../../src'
+import React, { useEffect, useState } from 'react'
+import { useCardanoWallets, useDappConnector } from '../../src'
 import { WalletMeta, WalletHeader, FeedbackSection } from './components'
 
 const App = () => {
-  const [walletName, setWalletName] = useState<string>('lace')
-  const { enable, isEnabled, apiVersion, name, icon, api } = useDappConnector({ walletName })
+  const [walletName, setWalletName] = useState<string>('')
+  const { wallets } = useCardanoWallets()
+  const { enable, isEnabled, isEnabling, isReady, apiVersion, name, icon, walletApi, error } = useDappConnector({
+    walletName
+  })
+
+  useEffect(() => {
+    if (!wallets || wallets?.length < 1) return
+    setWalletName(wallets?.[0].walletName)
+  }, [wallets])
 
   return (
     <div className="container" style={{ maxWidth: '40rem', marginTop: '1rem', marginBottom: '6rem' }}>
@@ -13,7 +21,10 @@ const App = () => {
       <hr />
       <WalletMeta
         entries={[
-          { label: 'isEnabled', value: String(isEnabled) },
+          { label: 'isEnabled (Authorized in the wallet)', value: String(isEnabled) },
+          { label: 'isEnabling', value: String(isEnabling) },
+          { label: 'isReady (WalletAPI ready to be used)', value: String(isReady) },
+          { label: 'error', value: error?.message },
           { label: 'name', value: name },
           { label: 'icon', value: <img src={icon} style={{ width: '2rem' }} /> },
           { label: 'apiVersion', value: apiVersion }
@@ -21,14 +32,14 @@ const App = () => {
       />
       <hr />
       <h2 className="title is-5">Wallet API</h2>
-      <FeedbackSection label="getNetworkId" getValue={api?.getNetworkId} />
-      <FeedbackSection label="getUtxos" getValue={api?.getUtxos} />
-      <FeedbackSection label="getCollateral" getValue={api?.getCollateral} />
-      <FeedbackSection label="getBalance" getValue={api?.getBalance} />
-      <FeedbackSection label="getUsedAddresses" getValue={api?.getUsedAddresses} />
-      <FeedbackSection label="getUnusedAddresses" getValue={api?.getUnusedAddresses} />
-      <FeedbackSection label="getChangeAddress" getValue={api?.getChangeAddress} />
-      <FeedbackSection label="getRewardAddresses" getValue={api?.getRewardAddresses} />
+      <FeedbackSection label="getNetworkId" getValue={walletApi?.getNetworkId} />
+      <FeedbackSection label="getUtxos" getValue={walletApi?.getUtxos} />
+      <FeedbackSection label="getCollateral" getValue={walletApi?.getCollateral} />
+      <FeedbackSection label="getBalance" getValue={walletApi?.getBalance} />
+      <FeedbackSection label="getUsedAddresses" getValue={walletApi?.getUsedAddresses} />
+      <FeedbackSection label="getUnusedAddresses" getValue={walletApi?.getUnusedAddresses} />
+      <FeedbackSection label="getChangeAddress" getValue={walletApi?.getChangeAddress} />
+      <FeedbackSection label="getRewardAddresses" getValue={walletApi?.getRewardAddresses} />
     </div>
   )
 }

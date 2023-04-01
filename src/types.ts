@@ -1,6 +1,4 @@
-import { GetNetworkId, WalletApi } from '@cardano-sdk/dapp-connector'
-
-type WalletName = string
+import { GetNetworkId, WalletApi, WalletName } from '@cardano-sdk/dapp-connector'
 
 type IsEnabled = Promise<boolean>
 type InitialApiEnable = () => Promise<WalletApi>
@@ -22,10 +20,13 @@ export interface UseDappConnectorProps {
 }
 
 export interface UseDappConnectorReturns {
-  api: WalletApi | null
+  walletApi: WalletApi | null
   enable: InternalEnable
   isEnabled: boolean
+  isEnabling: boolean
+  isReady: boolean
   apiVersion: ApiVersion
   name: WalletName
   icon: Icon
+  error: Error | null
 }

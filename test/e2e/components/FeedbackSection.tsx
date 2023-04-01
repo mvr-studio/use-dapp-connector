@@ -9,6 +9,7 @@ const FeedbackSection = ({ label, getValue }: FeedbackSectionProps) => {
   const [value, setValue] = useState('-')
 
   const handleClick = async () => {
+    setValue('-')
     if (!getValue) return
     const nextValue = await getValue()
     setValue(JSON.stringify(nextValue))

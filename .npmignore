@@ -1,0 +1,6 @@
+/src
+!/dist
+/test
+/e2e-dist
+/.parcel-cache
+/.github

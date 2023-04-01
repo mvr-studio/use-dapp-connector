@@ -1,62 +1,105 @@
-declare global {
-  interface Window {
-    cardano: Record<string, InitialApi>
-  }
+import { useEffect, useMemo, useState } from 'react'
+import { WalletApi } from '@cardano-sdk/dapp-connector'
+import { InternalEnable, UseDappConnectorProps, UseDappConnectorReturns } from '../types'
+import { getCardanoProxy } from '../utils'
+
+const Errors = {
+  INITIAL_API_NOT_AVAILABE: 'InitialApiNotAvailable',
+  WALLET_API_NOT_FOUND: 'WalletApiNotFound'
 }
 
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import { WalletApi } from '@cardano-sdk/dapp-connector'
-import { InitialApi, InternalEnable, UseDappConnectorProps, UseDappConnectorReturns } from '../types'
-
 const useDappConnector = ({ walletName }: UseDappConnectorProps): UseDappConnectorReturns => {
-  const [api, setApi] = useState<WalletApi | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [walletApi, setWalletApi] = useState<WalletApi | null>(null)
+  const [isReady, setIsReady] = useState<boolean>(false)
   const [isEnabled, setIsEnabled] = useState(false)
+  const [isEnabling, setIsEnabling] = useState(false)
+  const [error, setError] = useState<null | Error>(null)
+  const [windowCardano, setWindowCardano] = useState<any | null>(null)
 
-  const isWalletAvailable = useMemo(() => {
-    if (isLoading) return false
-    return !!window.cardano?.[walletName]
-  }, [isLoading, walletName])
-
+  /**
+   * Get specific Initial API from window.cardano
+   */
   const initialApi = useMemo(() => {
-    if (!isWalletAvailable) return
-    return window.cardano?.[walletName]
-  }, [isWalletAvailable, walletName])
+    if (!windowCardano) return null
+    try {
+      const initialApiFound = windowCardano?.[walletName]
+      if (!initialApiFound) throw new Error('InitialApiNotAvailable')
+      return initialApiFound
+    } catch (error) {
+      setError(error as Error)
+    }
+  }, [windowCardano, walletName])
 
-  const apiVersion = useMemo(() => (isWalletAvailable && initialApi?.apiVersion) || '', [isWalletAvailable])
-  const name = useMemo(() => (isWalletAvailable && initialApi?.name) || '', [isWalletAvailable])
-  const icon = useMemo(() => (isWalletAvailable && initialApi?.icon) || '', [isWalletAvailable])
+  /**
+   * Fetch wallet meta data
+   */
+  const apiVersion = useMemo(() => (!!initialApi && initialApi?.apiVersion) || '', [initialApi])
+  const name = useMemo(() => (!!initialApi && initialApi?.name) || '', [initialApi])
+  const icon = useMemo(() => (!!initialApi && initialApi?.icon) || '', [initialApi])
 
+  /**
+   * Fetch isEnabled from Initial API.
+   */
   useEffect(() => {
     const fetchIsEnabled = async () => {
-      if (!isWalletAvailable) return false
+      if (!initialApi) return false
       const nextState = (initialApi && (await initialApi.isEnabled())) || false
       setIsEnabled(nextState)
     }
     fetchIsEnabled()
-  }, [isWalletAvailable, initialApi])
+  }, [initialApi, isEnabling])
 
-  const loadHandler = () => {
-    setIsLoading(false)
-  }
-
-  useLayoutEffect(() => {
-    window.addEventListener('load', loadHandler)
-    return () => window.removeEventListener('load', loadHandler)
-  })
-
+  /**
+   * Enable specific wallet from within Initial API.
+   */
   const enable: InternalEnable = async () => {
-    if (!initialApi) return
-    const api = await initialApi.enable()
-    setApi(api)
+    setIsReady(false)
+    setIsEnabling(true)
+    try {
+      if (!initialApi) throw new Error(Errors.INITIAL_API_NOT_AVAILABE)
+      const walletApi = await initialApi.enable()
+      if (!walletApi) throw new Error(Errors.WALLET_API_NOT_FOUND)
+      setWalletApi(walletApi)
+      setIsReady(true)
+    } catch (error: unknown) {
+      setError(error as Error)
+    } finally {
+      setIsEnabling(false)
+    }
   }
 
+  /**
+   * Fetch window.cardano through the Proxy when the DOM is ready.
+   */
   useEffect(() => {
-    if (!isWalletAvailable) return
-    if (isEnabled && !api) enable()
-  }, [isWalletAvailable, isEnabled, api])
+    const onLoad = () => setWindowCardano(getCardanoProxy())
+    window.addEventListener('load', onLoad)
+    return () => window.removeEventListener('load', onLoad)
+  }, [])
 
-  return { api, enable, isEnabled, apiVersion, name, icon }
+  /**
+   * Clean up the local state on walletName change.
+   */
+  useEffect(() => {
+    setIsReady(false)
+    setWalletApi(null)
+    setIsEnabled(false)
+  }, [walletName])
+
+  /**
+   * Initialize WalletAPI.
+   */
+  useEffect(() => {
+    setError(null)
+    try {
+      if (!initialApi) throw new Error(Errors.INITIAL_API_NOT_AVAILABE)
+      if (isEnabled && !walletApi) enable()
+    } catch (error: unknown) {
+      setError(error as Error)
+    }
+  }, [initialApi, isEnabled, walletApi])
+
+  return { walletApi, enable, isEnabled, isEnabling, error, isReady, apiVersion, name, icon }
 }
 
 export default useDappConnector
