@@ -62,7 +62,7 @@ import { useCardanoWallets } from '@mvr-studio/use-dapp-connector'
 
 const Component = () => {
   // It lists Lace and Eternl in `wallets`, the rest of Cardano wallets found in
-  const { wallets } = useCardanoWallets({ allowlist: ['lace', 'eternl']
+  const { wallets } = useCardanoWallets({ allowlist: ['lace', 'eternl'] })
 }
 ```
 
@@ -75,8 +75,7 @@ import { useCardanoWallets } from '@mvr-studio/use-dapp-connector'
 
 const Component = () => {
   // It lists Lace and Eternl in `wallets`, the rest of Cardano wallets found in
-  const { wallets, experimentalWallets } = useCardanoWallets({ allowlist: ['lace', 'eternl'],
-  restExperimental: true
+  const { wallets, experimentalWallets } = useCardanoWallets({ allowlist: ['lace', 'eternl'], restExperimental: true })
 }
 ```
 
