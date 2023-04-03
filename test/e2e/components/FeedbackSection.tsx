@@ -3,9 +3,10 @@ import React, { useState } from 'react'
 interface FeedbackSectionProps {
   label: string
   getValue: (() => Promise<any>) | undefined
+  isReady: boolean
 }
 
-const FeedbackSection = ({ label, getValue }: FeedbackSectionProps) => {
+const FeedbackSection = ({ label, getValue, isReady }: FeedbackSectionProps) => {
   const [value, setValue] = useState('-')
 
   const handleClick = async () => {
@@ -18,7 +19,7 @@ const FeedbackSection = ({ label, getValue }: FeedbackSectionProps) => {
   return (
     <div className="columns" style={{ alignItems: 'center' }}>
       <div className="column is-half">
-        <button className="button is-link is-light" onClick={handleClick}>
+        <button className="button is-link is-light" onClick={handleClick} disabled={!isReady}>
           {label}
         </button>
       </div>

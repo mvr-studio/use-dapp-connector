@@ -1,5 +1,10 @@
 import { GetNetworkId, WalletApi, WalletName } from '@cardano-sdk/dapp-connector'
 
+export enum NetworkId {
+  Mainnet = 1,
+  Testnet = 0
+}
+
 type IsEnabled = Promise<boolean>
 type InitialApiEnable = () => Promise<WalletApi>
 export type InitialApiIsEnabled = () => IsEnabled
@@ -17,6 +22,8 @@ export interface InitialApi {
 
 export interface UseDappConnectorProps {
   walletName: WalletName
+  limitNetwork?: NetworkId | null
+  throwable?: boolean
 }
 
 export interface UseDappConnectorReturns {

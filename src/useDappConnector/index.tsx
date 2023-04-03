@@ -8,7 +8,11 @@ const Errors = {
   WALLET_API_NOT_FOUND: 'WalletApiNotFound'
 }
 
-const useDappConnector = ({ walletName }: UseDappConnectorProps): UseDappConnectorReturns => {
+const useDappConnector = ({
+  walletName,
+  limitNetwork = 0,
+  throwable = false
+}: UseDappConnectorProps): UseDappConnectorReturns => {
   const [walletApi, setWalletApi] = useState<WalletApi | null>(null)
   const [isReady, setIsReady] = useState<boolean>(false)
   const [isEnabled, setIsEnabled] = useState(false)
@@ -23,10 +27,11 @@ const useDappConnector = ({ walletName }: UseDappConnectorProps): UseDappConnect
     if (!windowCardano) return null
     try {
       const initialApiFound = windowCardano?.[walletName]
-      if (!initialApiFound) throw new Error('InitialApiNotAvailable')
+      if (!initialApiFound) throw new Error(Errors.INITIAL_API_NOT_AVAILABE)
       return initialApiFound
     } catch (error) {
       setError(error as Error)
+      if (throwable) throw error
     }
   }, [windowCardano, walletName])
 
@@ -63,6 +68,7 @@ const useDappConnector = ({ walletName }: UseDappConnectorProps): UseDappConnect
       setIsReady(true)
     } catch (error: unknown) {
       setError(error as Error)
+      if (throwable) throw error
     } finally {
       setIsEnabling(false)
     }
@@ -96,6 +102,7 @@ const useDappConnector = ({ walletName }: UseDappConnectorProps): UseDappConnect
       if (isEnabled && !walletApi) enable()
     } catch (error: unknown) {
       setError(error as Error)
+      if (throwable) throw error
     }
   }, [initialApi, isEnabled, walletApi])
 

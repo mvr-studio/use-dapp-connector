@@ -1,0 +1,27 @@
+name: Run Tests
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node.js 19.1
+        uses: actions/setup-node@v3
+        with:
+          node-version: 19.1
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Adjust NODE ENV
+        run: echo "NODE_OPTIONS=--openssl-legacy-provider" >> $GITHUB_ENV
+      - name: Build Dist
+        run: yarn build
+      - name: Run Unit
+        run: yarn test:unit --coverage
