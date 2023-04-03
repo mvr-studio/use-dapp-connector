@@ -19,8 +19,6 @@ jobs:
           node-version: 19.1
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Adjust NODE ENV
-        run: echo "NODE_OPTIONS=--openssl-legacy-provider" >> $GITHUB_ENV
       - name: Build Dist
         run: yarn build
       - name: Run Unit
