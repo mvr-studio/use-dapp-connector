@@ -1,6 +1,6 @@
 {
   "name": "@mvr-studio/use-dapp-connector",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@cardano-sdk/dapp-connector": "^0.8.0",
+    "@mvr-studio/obsrvd": "^0.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

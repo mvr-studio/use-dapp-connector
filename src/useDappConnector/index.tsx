@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { WalletApi } from '@cardano-sdk/dapp-connector'
 import { InternalEnable, UseDappConnectorProps, UseDappConnectorReturns } from '../types'
-import { getCardanoProxy } from '../utils'
 
 const Errors = {
   INITIAL_API_NOT_AVAILABE: 'InitialApiNotAvailable',
@@ -18,13 +17,14 @@ const useDappConnector = ({
   const [isEnabled, setIsEnabled] = useState(false)
   const [isEnabling, setIsEnabling] = useState(false)
   const [error, setError] = useState<null | Error>(null)
-  const [windowCardano, setWindowCardano] = useState<any | null>(null)
+
+  const windowCardano = useMemo(() => window?.cardano, [window?.cardano])
 
   /**
    * Get specific Initial API from window.cardano
    */
   const initialApi = useMemo(() => {
-    if (!windowCardano) return null
+    if (!window?.cardano) return null
     try {
       const initialApiFound = windowCardano?.[walletName]
       if (!initialApiFound) throw new Error(Errors.INITIAL_API_NOT_AVAILABE)
@@ -73,15 +73,6 @@ const useDappConnector = ({
       setIsEnabling(false)
     }
   }
-
-  /**
-   * Fetch window.cardano through the Proxy when the DOM is ready.
-   */
-  useEffect(() => {
-    const onLoad = () => setWindowCardano(getCardanoProxy())
-    window.addEventListener('load', onLoad)
-    return () => window.removeEventListener('load', onLoad)
-  }, [])
 
   /**
    * Clean up the local state on walletName change.

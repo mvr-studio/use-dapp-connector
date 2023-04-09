@@ -7,11 +7,10 @@ declare global {
 }
 
 import { WalletName } from '@cardano-sdk/dapp-connector'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { InitialApi } from '../types'
-import { getCardanoProxy } from '../utils'
 
-type ListableWallet = Pick<InitialApi, 'name' | 'icon'> & { walletName: string }
+export type ListableWallet = Pick<InitialApi, 'name' | 'icon'> & { walletName: string }
 
 interface UseCardanoWalletsProps {
   allowlist?: WalletName[]
@@ -19,8 +18,7 @@ interface UseCardanoWalletsProps {
 }
 
 const useCardanoWallets = (props?: UseCardanoWalletsProps) => {
-  const [walletsFound, setWalletsFound] = useState<ListableWallet[] | null>(null)
-  const [windowCardano, setWindowCardano] = useState<any | null>(null)
+  const [walletsFound, setWalletsFound] = useState<ListableWallet[]>([])
 
   /**
    * Sanitizes wallet props.
@@ -50,10 +48,12 @@ const useCardanoWallets = (props?: UseCardanoWalletsProps) => {
   }, [walletsFound, props?.allowlist, props?.restExperimental])
 
   /**
-   * Sanitize wallets inside window.cardano
+   * Fetch wallets programmatically. Some wallets like Nami load a little slower than the rest.
+   * If you want to fetch wallets on load, wrap this inside setTimeout and set the delay to 1000ms.
    */
-  useEffect(() => {
-    if (!windowCardano) return
+  const fetchWallets = async () => {
+    if (typeof window === 'undefined') return
+    const windowCardano = window.cardano
     const walletsArray: [WalletName, InitialApi][] = Object.entries(windowCardano || {})
     const cardanoWallets = walletsArray.map(([walletName, initialApi]) => ({
       walletName,
@@ -61,19 +61,10 @@ const useCardanoWallets = (props?: UseCardanoWalletsProps) => {
     }))
     const validWallets = cardanoWallets.filter((wallet) => wallet.hasOwnProperty('enable')).map(mapWalletProps)
     if (walletsFound?.length === validWallets.length) return
-    setWalletsFound(validWallets)
-  }, [windowCardano])
+    return setWalletsFound(validWallets)
+  }
 
-  /**
-   * Fetch window.cardano through the Proxy when the DOM is ready.
-   */
-  useEffect(() => {
-    const onLoad = () => setWindowCardano(getCardanoProxy())
-    window.addEventListener('load', onLoad)
-    return () => window.removeEventListener('load', onLoad)
-  }, [])
-
-  return { wallets, experimentalWallets }
+  return { fetchWallets, wallets, experimentalWallets }
 }
 
 export default useCardanoWallets

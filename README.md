@@ -49,7 +49,18 @@ Lists all Cardano wallets under `wallets`.
 import { useCardanoWallets } from '@mvr-studio/use-dapp-connector'
 
 const Component = () => {
-  const { wallets } = useCardanoWallets()
+  const { fetchWallets, wallets } = useCardanoWallets()
+
+  // 1. On load fetching, add timeout, because some wallets like Nami tend to load slower.
+  useEffect(() => {
+    setTimeout(() => fetchWallets, 1000)
+  }, [])
+
+  // 2. On events like onClick.
+  const onConnectWalletClick = () => {
+    fetchWallets()
+    setConnectWalletModalVisible(true)
+  }
 }
 ```
 

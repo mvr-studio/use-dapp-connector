@@ -1,15 +1,14 @@
 import React from 'react'
-import { useCardanoWallets } from '../../../src'
+import { ListableWallet } from '../../../src/useCardanoWallets'
 
 interface WalletHeaderProps {
   walletName: string
   setWalletName: (name: string) => void
   enable: () => void
+  wallets: ListableWallet[]
 }
 
-const WalletHeader = ({ walletName, setWalletName, enable }: WalletHeaderProps) => {
-  const { wallets } = useCardanoWallets()
-
+const WalletHeader = ({ walletName, setWalletName, enable, wallets }: WalletHeaderProps) => {
   return (
     <div>
       <label className="label" htmlFor="walletName">

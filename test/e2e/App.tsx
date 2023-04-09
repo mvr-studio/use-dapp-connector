@@ -4,21 +4,28 @@ import { WalletMeta, WalletHeader, FeedbackSection } from './components'
 
 const App = () => {
   const [walletName, setWalletName] = useState<string>('')
-  const { wallets } = useCardanoWallets()
+  const { fetchWallets, wallets } = useCardanoWallets()
   const { enable, isEnabled, isEnabling, isReady, apiVersion, name, icon, walletApi, error } = useDappConnector({
     walletName
   })
+  console.log(wallets)
 
   useEffect(() => {
     if (!wallets || wallets?.length < 1) return
-    setWalletName(wallets?.[0].walletName)
+    setWalletName(wallets?.[0]?.walletName)
   }, [wallets])
+
+  useEffect(() => {
+    setTimeout(() => {
+      fetchWallets()
+    }, 1000)
+  }, [])
 
   return (
     <div>
       <div className="container" style={{ maxWidth: '40rem', marginTop: '1rem' }}>
         <h1 className="title is-4">DApp Connector</h1>
-        <WalletHeader walletName={walletName} setWalletName={setWalletName} enable={enable} />
+        <WalletHeader walletName={walletName} setWalletName={setWalletName} enable={enable} wallets={wallets} />
         <hr />
         <WalletMeta
           entries={[
