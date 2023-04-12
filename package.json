@@ -1,18 +1,26 @@
 {
   "name": "@mvr-studio/use-dapp-connector",
-  "version": "0.0.3",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "version": "0.0.4",
+  "author": "Tomasz Marciniak <tomek@mvr.studio>",
+  "license": "MIT",
   "targets": {
     "e2e": {
       "source": "test/e2e/index.html"
     }
   },
-  "author": "Tomasz Marciniak <tomek@mvr.studio>",
-  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "tsup",
     "test:unit": "yarn jest",
     "e2e:start": "parcel --dist-dir e2e-dist",
     "e2e:build": "parcel build --dist-dir e2e-dist --public-url ./"
@@ -44,7 +52,7 @@
     "parcel": "^2.8.3",
     "prettier": "^2.8.7",
     "process": "^0.11.10",
-    "rimraf": "^4.4.1",
+    "tsup": "^6.7.0",
     "typescript": "^5.0.2"
   }
 }
